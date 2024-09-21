@@ -1,4 +1,6 @@
 # main.py
+from datetime import datetime
+
 import requests
 from bs4 import BeautifulSoup
 from fastapi import FastAPI
@@ -14,6 +16,14 @@ class Item(BaseModel):
 
 @app.post("/age/")
 async def create_item(item: Item):
+    # Convert date strings to datetime objects
+    today = datetime.strptime(item.today, "%m/%d/%Y")
+    ageat = datetime.strptime(item.ageat, "%m/%d/%Y")
+
+    # Check if 'ageat' is after 'today'
+    if ageat <= today:
+        return {"message": "'ageat' date must be after 'today' date."}
+
     # URL of the third-party API call
     third_party_url = f"https://www.calculator.net/age-calculator.html?today={item.today}&ageat={item.ageat}&x=Calculate"
     response = requests.get(third_party_url)
